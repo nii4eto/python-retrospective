@@ -1,40 +1,46 @@
 class TicTacToeBoard:
+    VALUES = ('X', 'O')
+    ROW = '{} | {} | {} | {} |\n'
+    X_WINS = 'X wins!'
+    O_WINS = 'O wins!'
+    GAME_IN_PROGRESS = 'Game in progress.'
+    DRAW = 'Draw!'
+
     def __init__(self):
         self.fields = {'A1': ' ', 'A2': ' ', 'A3': ' ',
                        'B1': ' ', 'B2': ' ', 'B3': ' ',
                        'C1': ' ', 'C2': ' ', 'C3': ' '}
 
-        self.values = ('X', 'O')
-        self.count = 0
         self.last_move = None
 
     def __setitem__(self, field, value):
         if field not in self.fields:
             raise InvalidKey
-        if value not in self.values:
+
+        if value not in self.VALUES:
             raise InvalidValue
+
         if self.fields[field] != ' ':
             raise InvalidMove
+
         if self.last_move == value:
             raise NotYourTurn
 
         self.fields[field] = value
         self.last_move = value
-        self.count += 1
 
     def __getitem__(self, key):
         return self.fields[key]
 
     def __str__(self):
-        row = '{} | {} | {} | {} |\n'
         place = self.fields
 
         board = '\n  -------------\n' +\
-                row.format('3', place['A3'], place['B3'], place['C3']) +\
+                self.ROW.format('3', place['A3'], place['B3'], place['C3']) +\
                 '  -------------\n' +\
-                row.format('2', place['A2'], place['B2'], place['C2']) +\
+                self.ROW.format('2', place['A2'], place['B2'], place['C2']) +\
                 '  -------------\n' +\
-                row.format('1', place['A1'], place['B1'], place['C1']) +\
+                self.ROW.format('1', place['A1'], place['B1'], place['C1']) +\
                 '  -------------\n' +\
                 '    A   B   C  \n'
 
@@ -57,26 +63,30 @@ class TicTacToeBoard:
 
     def game_status(self):
         if self.check_for_win('X'):
-            return 'X wins!'
+            return self.X_WINS
         elif self.check_for_win('O'):
-            return 'O wins!'
-        elif self.count == 9:
-            return 'Draw!'
+            return self.O_WINS
+        elif self.check_for_win(' ') is not True:
+            return self.DRAW
         else:
-            return 'Game in progress.'
+            return self.GAME_IN_PROGRESS
 
 
-class InvalidKey(Exception):
+class TicTacToeError(Exception):
     pass
 
 
-class InvalidValue(Exception):
+class InvalidKey(TicTacToeError):
     pass
 
 
-class InvalidMove(Exception):
+class InvalidValue(TicTacToeError):
     pass
 
 
-class NotYourTurn(Exception):
+class InvalidMove(TicTacToeError):
+    pass
+
+
+class NotYourTurn(TicTacToeError):
     pass
