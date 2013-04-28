@@ -1,4 +1,5 @@
-from collections import deque
+from collections import OrderedDict
+from itertools import starmap
 
 
 def groupby(func, seq):
@@ -7,8 +8,8 @@ def groupby(func, seq):
             for x in seq}
 
 
-def composition(func_1, func_2):
-    return lambda x: func_1(func_2(x))
+def composition(function_1, function_2):
+    return lambda x: function_1(function_2(x))
 
 
 def iterate(func):
@@ -20,27 +21,21 @@ def iterate(func):
 
 
 def zip_with(func, *iterables):
-    i = zip(*iterables)
-
-    while True:
-        yield func(*next(i))
+    return starmap(func, zip(*iterables))
 
 
 def cache(func, cache_size):
-    values = {}
-    cache_order = deque()
+    cache_order = OrderedDict()
 
     def func_cashed(*args):
-        if args in values:
-            return values[args]
-
+        if args in cache_order:
+            return cache_order[args]
         result = func(*args)
 
         if cache_size:
-            if len(values) == cache_size:
-                values.pop(cache_order.popleft())
-            cache_order.append(args)
-            values[args] = result
+            if len(cache_order) == cache_size:
+                cache_order.popitem(last=False)
+            cache_order[args] = result
 
         return result
     return func_cashed
