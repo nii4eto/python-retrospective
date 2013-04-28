@@ -4,17 +4,12 @@ class Person:
         self.name = name
         self.birth_year = birth_year
         self.gender = gender
-        if mother:
-            self.mother = mother
-            self.mother.child.append(self)
-        else:
-            self.mother = None
+        self.mother = mother
+        self.father = father
 
-        if father:
-            self.father = father
-            self.father.child.append(self)
-        else:
-            self.father = None
+        for parent in [self.mother, self.father]:
+            if parent:
+                parent.child.append(self)
 
     def children(self, **kwargs):
         if kwargs:
@@ -24,7 +19,6 @@ class Person:
             return self.child
 
     def get_brothers(self):
-        brothers = set()
         mother_sons = set()
         father_sons = set()
 
@@ -37,11 +31,10 @@ class Person:
                            if self.father.gender == kid.gender
                            and kid is not self}
 
-        brothers = mother_sons.union(father_sons)
-        return list(brothers)
+        brothers = list(mother_sons.union(father_sons))
+        return brothers
 
     def get_sisters(self):
-        sisters = set()
         mother_daughters = set()
         father_daughters = set()
 
@@ -54,13 +47,11 @@ class Person:
                                 if self.father.gender != kid.gender
                                 and kid is not self}
 
-        sisters = mother_daughters.union(father_daughters)
-        return list(sisters)
+        sisters = list(mother_daughters.union(father_daughters))
+        return sisters
 
-    def is_direct_successor(self, child):
-        if self == child.mother:
-            return True
-        elif self == child.father:
+    def is_direct_successor(self, kid):
+        if kid in self.child:
             return True
         else:
             return False
